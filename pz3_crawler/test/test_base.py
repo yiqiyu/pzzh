@@ -8,6 +8,197 @@ from pz3_crawler.core.crawler import Crawler
 from pz3_crawler.core.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
 from pz.tools.mongoutils import mongo
 import pymongo
+#
+# # -*- coding: utf-8 -*-
+#
+# import unittest
+# import pymongo
+# import re
+# from pzcode import config
+from pz3_crawler.core.crawler_mgr import CrawlerMgr
+from pz3_crawler.core.crawler_conf import CrawlerConf,CrawlerConfItem
+
+# from pz_download.handler.base import CrawlerConfItem,CrawlerConf,Crawler
+# from pzcode.mongocrawler.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
+import json
+from pz3_crawler.conf.setting import log
+
+# from pz_download.handler.log import get_log
+import tldextract
+#
+# log = get_log()
+#
+
+class TestClass(unittest.TestCase):
+    '''
+    这是抓取测试基类。
+    '''
+
+    def setUp(self):
+        self.crawler_rule_db_name = "crawler_rules"
+        self.mongo_connect = "mongodb://192.168.1.202:27017/"
+        self.mongo_client = pymongo.MongoClient(self.mongo_connect)
+        self.db = self.mongo_client[self.crawler_rule_db_name]
+        self.crawler_mgr = CrawlerMgr(self.db)
+
+    def tearDown(self):
+        "Hook method for deconstructing the test fixture after testing it."
+        pass
+
+
+    def _insert_crawler_conf(self,domain, conf,tye):
+        '''
+        插入抓取配置。
+        :param domain:
+        :param conf:
+        :param tye:
+        :return:
+        '''
+        crawl_conf = CrawlerConf(domain,tye)
+        crawl_conf.add_conf_dict(**conf)
+
+        self.crawler_mgr.insert(crawl_conf)
+
+    def _insert_parse_conf(self,domain,rule,type):
+        '''
+        插入解析规则到数据表中。
+        :param domain:
+        :param rule:
+        :param type:
+        :return:
+        '''
+        db = ParserRuleDb(self.mongo_connect,self.crawler_rule_db_name)
+        db.add_parser_rule(rule,    HtmlParserBase.PARSE_RULES, type)
+
+
+    def search_crawler_and_parser_from_db(self,search_name, type, header=None, **kwargs):
+        '''
+        抓取搜索结果的分析页面。
+        :param search_name:     [string]搜索的名称，这个名称是自定义的。
+        :param type:
+        :param header:
+        :param kwargs:  [dict]分析中所需要的关键字。通常的如{"keyword":"雷军"}
+        :return:
+        '''
+        pass
+
+
+
+    def crawler_and_parser_from_db(self,url,type,header=None):
+        '''
+        全部通过数据库中的配置来进行读取和解析。
+        :param url:
+        :param type:
+        :param header:
+        :return:
+        '''
+
+        crawler  =self.crawler_mgr.get_crawler_object(url,type)
+
+        code, content = crawler.get(url,header)
+
+        if code== 200:
+
+            judge = UrlParserJudge(self.db)
+            parser = judge.test_parser(url,type)
+            if parser:
+                result = parser.parser(url,content)
+                print(json.dumps(result,indent=4, ensure_ascii=False))
+            else:
+                print("judge.test is None")
+
+        else:
+            print(code,content)
+
+    def crawler_db_and_parser(self,url,rule,header=None,conf=None):
+        '''
+        通过数据库中的抓取配置使用本地的解析配置。
+        :param url:
+        :param rule:
+        :param header:
+        :param conf:
+        :return:
+        '''
+        crawler  =self.crawler_mgr.get_crawler_object(url,type)
+
+        code, content = crawler.get(url,header)
+
+        if code== 200:
+            parser = HtmlParserBase(rule)
+
+            if parser:
+                result = parser.parser(url,content)
+                log.info(json.dumps(result,indent=4,ensure_ascii=False))
+            else:
+                log.info("judge.test is None")
+        else:
+            log.info("%d:%s"%(code,content))
+
+
+    def crawler_and_parser(self,url,rule,header=None,conf=None,type=None):
+        '''
+        全部使用本地的配置。进行抓取与解析的测试。
+        :param url:
+        :param rule:
+        :param header:
+        :param conf:
+        :return:
+        '''
+
+        parse_result = tldextract.extract(url)
+
+        hostname = parse_result.subdomain + "." + parse_result.domain + '.' + parse_result.suffix
+        domain = parse_result.domain + '.' + parse_result.suffix
+
+        if not parse_result.subdomain:
+            hostname = domain
+
+        crawler_param = {
+            'domain':domain,
+            'url_type':type,  #url类型,可以是 媒体,文章,评论"
+        }
+
+        def_conf = {
+            'header':{
+                "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Encoding":"gzip, deflate, sdch",
+                "Accept-Language":"zh-CN,zh;q=0.8,en;q=0.6",
+                "Cache-Control":"max-age=0",
+                "Connection":"keep-alive",
+                "Host":hostname,
+                "Upgrade-Insecure-Requests":"1",
+                "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36"
+             },
+            'url_type':type,
+            "cookie":'',
+            "end_rule":[
+                #'class=\"main-section\"',
+            ]
+        }
+
+        crawler_param.update(def_conf)
+
+        if conf:
+            crawler_param.update(conf)
+
+        crawler = Crawler(**crawler_param)
+
+        statue, content = crawler.get(url=url)
+        if statue== 200:
+
+            if rule:
+                parser = HtmlParserBase(rule)
+                if parser:
+                    result = parser.parser(url,content)
+                    log.info(json.dumps(result,indent=4,ensure_ascii=False))
+                else:
+                    log.info("judge.test is None")
+            else:
+                log.info( "No Rule exist!!")
+                log.info(content)
+
+        else:
+            log.info(statue,content)
 
 
 class TestParserHtml(unittest.TestCase):

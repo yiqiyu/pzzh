@@ -170,10 +170,12 @@ class ExtractorObjectGroup(ExtractorGroup):
 
             for tmp_item in tmp_result:
 
-                if isinstance(tmp_item,unicode):
-                    tmp_item = tmp_item.encode("utf-8")
+                # if isinstance(tmp_item,unicode):
+                #     tmp_item = tmp_item.encode("utf-8")
 
-                tmp_xml = etree.HTML(tmp_item.lower().decode('utf-8'))
+                #tmp_xml = etree.HTML(tmp_item.lower().decode('utf-8'))
+                tmp_xml = etree.HTML(tmp_item.lower())
+
 
                 tmp_obj = {}
 

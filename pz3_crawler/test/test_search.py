@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = 'commissar'
-from pz_download.handler.log import get_log
 import unittest
 import json
-from pz_download.handler.select import SearchCrawler
+from pz3_crawler.core.search_crawler import SearchCrawler
 
 class TestSearch(unittest.TestCase):
 
@@ -35,7 +34,7 @@ class TestSearch(unittest.TestCase):
             #     'div\sclass=\"s_post\"',
             # ],
 
-        encode = 'utf8'
+        encode = 'gbk'
 
         parse_rule = {
             "domain":"baidu.com",
@@ -157,7 +156,7 @@ class TestSearch(unittest.TestCase):
 
         result = crawler.get_page_urls()
 
-        print json.dumps(result,ensure_ascii=True, indent=4)
+        print(json.dumps(result,ensure_ascii=False, indent=4))
 
 
 if __name__ == '__main__':

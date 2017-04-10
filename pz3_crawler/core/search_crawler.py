@@ -7,6 +7,7 @@ import traceback
 from pz3_crawler.core.crawler import Crawler
 from pz3_crawler.core.parser import HtmlParserBase
 import tldextract
+from pz3_crawler.conf.setting import log
 
 class SearchCrawler(object):
     '''
@@ -133,7 +134,7 @@ class SearchCrawler(object):
 
         while (not b_exit):
 
-            crawl_obj = Crawler(domain=domain, header=header,proxy=self._proxy,ref_url=ref_url,url_type=CrawlerMgr.SEARCH_URL,encode=self._encode)
+            crawl_obj = Crawler(domain=domain, header=header,proxy=self._proxy,ref_url=ref_url,url_type=Crawler.SEARCH_URL,encode=self._encode)
 
             status,content = crawl_obj.get(cur_url)
 

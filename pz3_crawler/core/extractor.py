@@ -5,8 +5,9 @@ import re
 import lxml
 from lxml import etree
 from lxml.etree import _Element
-# import HTMLParser
+from html.parser import HTMLParser
 from bs4 import BeautifulSoup
+# from pz3_crawler.core.parser import HTMLParser
 
 import sys
 # reload(sys)
@@ -169,8 +170,8 @@ class PostfixValueExtractor(BaseValueExtractor):
 
         expre = self.expression
 
-        if isinstance(expre,unicode):
-            expre = expre.encode("utf-8")
+        # if isinstance(expre,unicode):
+        #     expre = expre.encode("utf-8")
         return expre + last_val
 
 class PrefixValueExtractor(BaseValueExtractor):
@@ -201,7 +202,7 @@ class OtherValueExtractor(BaseValueExtractor):
 
         #unescape 将上次的结果进行HTML转义，即将&amp; &lt; &gt; 转换成 & < >
         if self.func == "unescape":
-            html_parser = HTMLParser.HTMLParser()
+            html_parser = HTMLParser()#.HTMLParser()
             return html_parser.unescape(last_val)
         else:
             return last_val
