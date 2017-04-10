@@ -4,10 +4,9 @@ __author__ = 'commissar'
 
 import unittest
 import json
-from pz_crawler.core.crawler import Crawler
-from pz_crawler.core.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
-from pz_crawler.tools.mongoutils import mongo
-# from pz_download.handler.base import Crawler as
+from pz3_crawler.core.crawler import Crawler
+from pz3_crawler.core.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
+from pz.tools.mongoutils import mongo
 import pymongo
 
 

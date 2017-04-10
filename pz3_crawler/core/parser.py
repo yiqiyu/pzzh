@@ -6,7 +6,7 @@ import tldextract
 from bs4 import BeautifulSoup
 
 import re
-from pz_crawler.core import extractor
+from pz3_crawler.core import extractor
 import hashlib
 import lxml.html.soupparser
 import lxml.html.html5parser
