@@ -4,6 +4,7 @@ __author__ = 'commissar'
 
 import unittest
 import json
+
 from pz3_crawler.core.crawler import Crawler
 from pz3_crawler.core.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
 from pz.tools.mongoutils import mongo
@@ -199,6 +200,7 @@ class TestParserHtml(unittest.TestCase):
         self.mongo_db = "crawler_rules"
         self.mc = mongo(self.mongo_connect).getclient(self.mongo_db)
         self.crawler = Crawler("","")
+        # self.search_crawler = SearchCrawler()
         self.mongo_client = pymongo.MongoClient(self.mongo_connect)
         self.db = self.mongo_client["crawler_rules"]
 
@@ -243,7 +245,7 @@ class TestParserHtml(unittest.TestCase):
 
 
     def __crawler_and_parser_from_db(self,url,type,header=None):
-        code, content = self.crawler.content(url,header)
+        code, content = self.crawler.get(url,header)
 
         if code== 200:
 
@@ -431,7 +433,7 @@ class TestParserHtml(unittest.TestCase):
             "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36"
         }
 
-        code,content = self.crawler.content(url,header)
+        code,content = self.crawler.get(url,header)
 
         if code == 200:
             judge = UrlParserJudge(self.mc)
@@ -521,7 +523,7 @@ class TestParserHtml(unittest.TestCase):
             "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36"
         }
 
-        code , content = self.crawler.content(url,header)
+        code , content = self.crawler.get(url,header)
 
         if code== 200:
 
@@ -1263,7 +1265,7 @@ class TestParserHtml(unittest.TestCase):
                 {
                     "name": "default",
                     "url_template": [
-                        "^http[s]?://tieba.baidu.com/f/search/res?"
+                        "^http[s]?://api.search.sina.com.cn/?"
                     ],
                     "end_rule": [ ],
                     "header": {
@@ -1292,7 +1294,7 @@ class TestParserHtml(unittest.TestCase):
         }
         self.__crawler_and_parser(url, rule, header)
 
-    def test_ent_sina_article(self):
+    def test_ent_sina_column_article(self):
         url = "http://ent.sina.com.cn/zl/discuss/2017-04-10/doc-ifyeceza1837231.shtml"
         header = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -1312,22 +1314,81 @@ class TestParserHtml(unittest.TestCase):
             "parse_rules": [
                 {
                     "rule_uuid": "xxxx",  # 这条匹配规则的ID，
-                    "url_match": [r"^http[s]?://ent.sina.com.cn/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "url_match": [r"^http[s]?://ent.sina.com.cn/zl/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
                     "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
                 # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
                     "author": [{"type": "xpath", "express": "//*[@id='author_ename']/a", "func": "text"},],  # 代表作者
-                    "origin_meida_name": [{"type": "xpath", "express": "//*[@id='J_Article_Wrap']/div[1]/div[1]/div[1]/a[1]", "func": "text"}, ],
-                # 转载自,原始媒体名。
-                    "origin_url": [{"type": "css", "express": ".pic-source > .copyfrom", "func": "html"},
-                                   {"type": "xpath", "express": "//@href", "func": ""}],  # 原始链接。
+                    "origin_meida_name": [
+                        {"type": "xpath", "express": "//*[@id='pub_date']/following-sibling::a[1]",
+                         "func": "text"}, ],
+                    # # 转载自,原始媒体名。
+                    "origin_url": [{"type": "xpath", "express": "//*[@id='pub_date']/following-sibling::a[1]",
+                                    "func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。 # 原始链接。
                     "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
                     "publish_at": [{"type": "xpath", "express": "//*[@id='pub_date']", 'func': "text"},
                                    {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
                                     "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
                     "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
                              ],  # 文章原始Tag
-                    # imgs:[],
+                    "imgs": [{"type": "css", "express": "#artibody img", "func": "html"},
+                             {"type": "xpath", "express": "//@src", "func": ""}],
                     # comment_num:[]
+                    # like_num:[]
+                    # dislike_num:[]
+                    # filters:[]
+                    # comments:{
+                    #
+                    # }
+                }
+            ]
+        }
+        self.__crawler_and_parser(url, rule, header)
+
+    def test_ent_sina_article(self):
+        # url = "http://ent.sina.com.cn/y/yneidi/2016-05-10/doc-ifxryhhi8589896.shtml"
+        url= "http://ent.sina.com.cn/tv/zy/2017-04-11/doc-ifyeceza2068490.shtml"
+        header = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            "Cache - Control": "max - age = 0",
+            'Connection': 'keep-alive',
+            'Host': 'ent.sina.com.cn',
+            'Referer': 'http://ent.sina.com.cn/',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        rule = {
+            "domain": "ent.sina.com.cn",
+            "type": "article",  # 其有两个值，article或comment
+            "parse_rules": [
+                {
+                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
+                    "url_match": [r"^http[s]?://ent.sina.com.cn/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
+                    # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
+                    "author": [{"type": "xpath", "express": "//*[@id='author_ename']/a", "func": "text"}, ],  # 代表作者
+                    "origin_meida_name": [
+                        {"type": "bs4", "express": {"class": "time-source"}, "func": "find_one", "param": "text"},
+                        {"type": "regex", "express": "\s+(\S+)\s+(\S+)\s+(\S+)", "func":"search", "param": 3},
+                        # {"type": "regex", "express": "\s", "func": "sub", "param": "" }
+                    ],
+                    # 转载自,原始媒体名。
+                    "origin_url": [{"type": "css", "express": "#page-tools > span > span.titer + span > a:first-child",
+                                    "func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。
+                    "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
+                    "publish_at": [{"type": "css", "express": "#page-tools > span > span.titer", 'func': "text"},
+                                   {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
+                                    "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
+                    "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
+                             ],  # 文章原始Tag
+                    "imgs":[{"type": "css", "express": "#artibody img", "func": "html"},
+                            {"type": "xpath", "express": "//@src", "func": ""}],
+                    # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
                     # like_num:[]
                     # dislike_num:[]
                     # filters:[]
@@ -1392,8 +1453,10 @@ class TestParserHtml(unittest.TestCase):
         self.__crawler_and_parser(url, rule, header)
 
     def test_tech_sina_article(self):
-        url = "http://tech.sina.com.cn/i/2017-04-10/doc-ifyecezv2933520.shtml"
+        url = "http://tech.sina.com.cn/mobile/n/n/2017-04-11/doc-ifyecezv3069166.shtml"
         # url= "http://tech.sina.com.cn/it/2017-04-10/doc-ifyeceza1914635.shtml"
+        url = "http://tech.sina.com.cn/mobile/n/c/2017-04-11/doc-ifyeceza2021098.shtml"
+
         header = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
@@ -1411,7 +1474,7 @@ class TestParserHtml(unittest.TestCase):
             "parse_rules": [
                 {
                     "rule_uuid": "xxxx",  # 这条匹配规则的ID，
-                    "url_match": [r"^http[s]?://tech.sina.com.cn/^(/zl/).+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "url_match": [r"^http[s]?://tech.sina.com.cn/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
                     "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
                     # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
                     "author": [{"type": "xpath", "express": "//*[@id='author_ename']/a", "func": "text"}, ],  # 代表作者
@@ -1443,54 +1506,227 @@ class TestParserHtml(unittest.TestCase):
         }
         self.__crawler_and_parser(url, rule, header)
 
-        def test_tech_sina_column_article(self):
-            url = "http://tech.sina.com.cn/i/2017-04-10/doc-ifyecezv2933520.shtml"
-            # url= "http://tech.sina.com.cn/it/2017-04-10/doc-ifyeceza1914635.shtml"
-            header = {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Encoding': 'gzip, deflate, sdch',
-                'Accept-Language': 'zh-CN,zh;q=0.8',
-                "Cache - Control": "max - age = 0",
-                'Connection': 'keep-alive',
-                'Host': 'tech.sina.com.cn',
-                'Referer': 'http://tech.sina.com.cn/',
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
-                'Upgrade - Insecure - Requests': '1'
-            }
-            rule = {
-                "domain": "tech.sina.com.cn",
-                "type": "article",  # 其有两个值，article或comment
-                "parse_rules": [
-                    {
-                        "rule_uuid": "xxxx",  # 这条匹配规则的ID，
-                        "url_match": [r"^http[s]?://tech.sina.com.cn/zl/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
-                        "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
-                        # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
-                        "author": [{"type": "xpath", "express": "//*[@id='author_ename']/a", "func": "text"}, ],  # 代表作者
-                        "origin_meida_name": [
-                            {"type": "css", "express": "#media_name > a.ent1.fred",
-                             "func": "text"}, ],
-                        # # 转载自,原始媒体名。
-                        "origin_url": [{"type": "css", "express": "#media_name > a.ent1.fred",
-                                        "func": "html"},
-                                       {"type": "xpath", "express": "//@href", "func": ""}
-                                       ],  # 原始链接。
-                        "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
-                        "publish_at": [{"type": "css", "express": "#page-tools > span > span.titer", 'func': "text"},
-                                       {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
-                                        "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
-                        "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
-                                 ],  # 文章原始Tag
-                        "imgs": [{"type": "css", "express": "#artibody img", "func": "html"},
-                                 {"type": "xpath", "express": "//@src", "func": ""}],
-                        # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
-                        # like_num:[]
-                        # dislike_num:[]
-                        # filters:[]
-                        # comments:{
-                        #
-                        # }
-                    }
-                ]
-            }
-            self.__crawler_and_parser(url, rule, header)
+    def test_tech_sina_column_article(self):
+        url = "http://tech.sina.com.cn/zl/post/detail/i/2017-04-10/pid_8510451.htm?cre=sinapc&mod=g&loc=11&r=0&doct=0&rfunc=68&tj=none&s=0"
+        url= "http://tech.sina.com.cn/zl/post/detail/i/2017-04-10/pid_8510466.htm"
+        header = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            "Cache - Control": "max - age = 0",
+            'Connection': 'keep-alive',
+            'Host': 'tech.sina.com.cn',
+            'Referer': 'http://tech.sina.com.cn/',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        rule = {
+            "domain": "tech.sina.com.cn",
+            "type": "article",  # 其有两个值，article或comment
+            "parse_rules": [
+                {
+                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
+                    "url_match": [r"^http[s]?://tech.sina.com.cn/zl/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.htm", ],
+                    "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
+                    # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
+                    "author": [{"type": "xpath", "express": "//*[@id='author_ename']/a", "func": "text"}, ],  # 代表作者
+                    "origin_meida_name": [
+                        {"type": "css", "express": "#media_name > a:nth-child(1)",
+                         "func": "text"}, ],
+                    # # 转载自,原始媒体名。
+                    "origin_url": [{"type": "css", "express": "#media_name > a:nth-child(1)",
+                                    "func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。
+                    "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
+                    "publish_at": [{"type": "css", "express": "#pub_date", 'func': "text"},
+                                   {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
+                                    "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
+                    "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
+                             ],  # 文章原始Tag
+                    "imgs": [{"type": "css", "express": "#artibody img", "func": "html"},
+                             {"type": "xpath", "express": "//@src", "func": ""}],
+                    # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
+                    # like_num:[]
+                    # dislike_num:[]
+                    # filters:[]
+                    # comments:{
+                    #
+                    # }
+                }
+            ]
+        }
+        self.__crawler_and_parser(url, rule, header)
+
+    def test_finance_sina_article(self):
+        url = "http://finance.sina.com.cn/china/gncj/2017-04-11/doc-ifyecezv3132940.shtml"
+        url= "http://finance.sina.com.cn/roll/2017-04-11/doc-ifyecfnu7996781.shtml"
+        # url = "http://finance.sina.com.cn/money/fund/jjyj/2017-04-11/doc-ifyeceza2023578.shtml"
+        # url = "http://finance.sina.com.cn/stock/usstock/c/2017-04-11/doc-ifyecezv3138160.shtml"
+        url = "http://finance.sina.com.cn/money/nmetal/jyb/2017-02-28/doc-ifyavrsx5402553.shtml"
+        # url = "http://finance.sina.com.cn/zl/international/2017-03-31/zl-ifycwymx2897053.shtml"
+        url = "http://finance.sina.com.cn/stock/hkstock/hkgg/2017-04-11/doc-ifyecezv3187360.shtml"
+        header = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            "Cache - Control": "max - age = 0",
+            'Connection': 'keep-alive',
+            'Host': 'finance.sina.com.cn',
+            'Referer': 'http://finance.sina.com.cn/',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        rule = {
+            "domain": "finance.sina.com.cn",
+            "type": "article",  # 其有两个值，article或comment
+            "parse_rules": [
+                {
+                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
+                    "url_match": [r"^http[s]?://finance.sina.com.cn/(?!z|(?:stock/usstock)).+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
+                    # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
+                    "author": [{"type": "css", "express": "p.article-editor", "func": "text"},
+                               {"type": "regex", "express": "(.*?)：(.*?) ", "func": 'search',
+                                "param": "2"}
+                               ],  # 代表作者
+                    # "origin_meida_name": [
+                    #     {"type": "css", "express": "span.time-source > span > a",
+                    #      "func": "text"}, ],
+                    "origin_meida_name": [
+                        {"type": "bs4", "express": {"class": "time-source"}, "param": "text", "func": "find_one"},
+                        {"type": "regex", "express": "\n \n(.*?)\n", "func": 'search',
+                         "param": "1"}
+                    ],
+                    # # 转载自,原始媒体名。
+                    "origin_url": [{"type": "css", "express": "span.time-source > span > a",
+                                    "func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。
+                    "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
+                    "publish_at": [{"type": "css", "express": "span.time-source", 'func': "text"},
+                                   {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
+                                    "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
+                    "tags": [{"type": "css", "express": ".article-keywords a", "func": "text"},
+                             ],  # 文章原始Tag
+                    "imgs":[{"type": "css", "express": "#artibody img", "func": "html"},
+                            {"type": "xpath", "express": "//@src", "func": ""}],
+                    # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
+                    # like_num:[]
+                    # dislike_num:[]
+                    # filters:[]
+                    # comments:{
+                    #
+                    # }
+                }
+            ]
+        }
+        self.__crawler_and_parser(url, rule, header)
+
+    def test_finance_usstock_sina_article(self):
+        url = "http://finance.sina.com.cn/stock/usstock/c/2017-04-11/doc-ifyeceza2024398.shtml"
+        header = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            "Cache - Control": "max - age = 0",
+            'Connection': 'keep-alive',
+            'Host': 'finance.sina.com.cn',
+            'Referer': 'http://finance.sina.com.cn/',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        rule = {
+            "domain": "finance.sina.com.cn",
+            "type": "article",  # 其有两个值，article或comment
+            "parse_rules": [
+                {
+                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
+                    "url_match": [r"^http[s]?://finance.sina.com.cn/stock/usstock/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
+                    # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
+                    "author": [{"type": "css", "express": "p.article-editor", "func": "text"},
+                               {"type": "regex", "express": "(.*?)：(.*?) ", "func": 'search',
+                                "param": "2"}
+                               ],  # 代表作者
+                    "origin_meida_name": [{"type": "css", "express": "#media_name", "func": "text"},
+                                          {"type": "regex", "express": "\s", "func": 'sub',
+                                           "param": ""}
+                                          ],
+                    # # 转载自,原始媒体名。
+                    "origin_url": [{"type": "css", "express": "#media_name > a","func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。
+                    "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
+                    "publish_at": [{"type": "css", "express": "#pub_date", 'func': "text"},
+                                   {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
+                                    "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
+                    "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
+                             ],  # 文章原始Tag
+                    "imgs": [{"type": "css", "express": "#artibody img", "func": "html"},
+                             {"type": "xpath", "express": "//@src", "func": ""}],
+                    # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
+                    # like_num:[]
+                    # dislike_num:[]
+                    # filters:[]
+                    # comments:{
+                    #
+                    # }
+                }
+            ]
+        }
+        self.__crawler_and_parser(url, rule, header)
+
+    def test_finance_column_sina_article(self):         # TODO:网页编码问题
+        url = "http://finance.sina.com.cn/zl/international/2017-03-31/zl-ifycwymx2897053.shtml"
+        header = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8',
+            "Cache - Control": "max - age = 0",
+            'Connection': 'keep-alive',
+            'Host': 'finance.sina.com.cn',
+            'Referer': 'http://finance.sina.com.cn/',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        rule = {
+            "domain": "finance.sina.com.cn",
+            "type": "article",  # 其有两个值，article或comment
+            "parse_rules": [
+                {
+                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
+                    "url_match": [r"^http[s]?://finance.sina.com.cn/zl/.+?/\d{4}-\d{2}-\d{2}/.*?\d{1,10}.shtml$", ],
+                    "title": [{"type": "xpath", "express": '//h1', 'func': "text"}, ],
+                    # 代表标题的获取方式，将依次执行后面的表达式，regex代表后面的表达式是一个正则表达式，xpath代表后面是一个路径获取。
+                    "author": [{"type": "css", "express": "p.article-editor", "func": "text"},
+                               {"type": "regex", "express": "(.*?)：(.*?) ", "func": 'search',
+                                "param": "2"}
+                               ],  # 代表作者
+                    "origin_meida_name": [{"type": "css", "express": "#media_name", "func": "text"},
+                                          {"type": "regex", "express": "\s", "func": 'sub',
+                                           "param": ""}
+                                          ],
+                    # # 转载自,原始媒体名。
+                    "origin_url": [{"type": "css", "express": "#media_name > a","func": "html"},
+                                   {"type": "xpath", "express": "//@href", "func": ""}
+                                   ],  # 原始链接。
+                    "content": [{"type": "xpath", "express": "//*[@id='artibody']", "func": "html"}, ],  # [必填]内容
+                    "publish_at": [{"type": "css", "express": "#pub_date", 'func': "text"},
+                                   {"type": "regex", "express": "[\d]{4}.[\d]{2}.[\d]{2}.", "func": 'search',
+                                    "param": "0"}],  # 代表发布时间。//*[@id="page-tools"]/span/span[1]
+                    "tags": [{"type": "css", "express": ".art_keywords a", "func": "text"},
+                             ],  # 文章原始Tag
+                    "imgs": [{"type": "css", "express": "#artibody img", "func": "html"},
+                             {"type": "xpath", "express": "//@src", "func": ""}],
+                    # "comment_num":[{"type": "xpath", "express": "//*[@id='commentCount1']", "func": "text"}]
+                    # like_num:[]
+                    # dislike_num:[]
+                    # filters:[]
+                    # comments:{
+                    #
+                    # }
+                }
+            ]
+        }
+        self.__crawler_and_parser(url, rule, header)

@@ -353,7 +353,7 @@ class HtmlParserBase(object):
         data = getattr(class_, config['main'])(url,content,config)
         return data
 
-
+    @staticmethod
     def decode_html(html_string):
         from bs4 import UnicodeDammit             # BeautifulSoup 4
 
@@ -386,6 +386,7 @@ class HtmlParserBase(object):
         }
         '''
         html_src = content.lower()
+        # html_src = self.decode_html(html_src)
         document = None
 
         # 将条件注释判断浏览器<!--[if !IE]><!--[if IE]><!--[if lt IE 6]><!--[if gte IE 6]> 这种注释删除，
@@ -400,12 +401,13 @@ class HtmlParserBase(object):
 
         for reg_pl in reg_list:
             html_src,_ = re.subn(reg_pl, "", html_src,0,re.IGNORECASE|re.MULTILINE)
-
+        # import chardet
+        # print(chardet.detect(content))
 
         if isinstance(content,str):
             # document = etree.HTML(content.lower())
 
-            document =  lxml.html.soupparser.fromstring(html_src.lower(),features='html5lib')#'html.parser')
+            document =  lxml.html.soupparser.fromstring(html_src, features='html5lib')#'html.parser')
             # document = lxml.html.html5parser.fromstring(html_src)
             # document = lxml.html.fromstring(html_src)
         else:
