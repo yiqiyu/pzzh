@@ -1,0 +1,60 @@
+[2017-04-07 17:34:37,564-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.huxiu.com/article/175695.html]
+[2017-04-07 17:34:37,566-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.huxiu.com
+[2017-04-07 17:34:37,685-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:34:38,152-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.huxiu.com/article/175695.html][200][proxy:None]
+[2017-04-07 17:34:38,176-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[https://www.huxiu.com/member/322384.html]
+[2017-04-07 17:34:38,176-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:34:38,657-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][https://www.huxiu.com/member/322384.html][200][proxy:None]
+[2017-04-07 17:34:38,677-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html]
+[2017-04-07 17:34:38,678-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:34:39,117-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html][200][proxy:None]
+[2017-04-07 17:34:39,124-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/author/niu2208]
+[2017-04-07 17:34:39,125-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:34:39,584-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/author/niu2208][200][proxy:None]
+[2017-04-07 17:34:39,590-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/i6366436759131128321/]
+[2017-04-07 17:34:39,591-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:34:39,872-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/i6366436759131128321/][200][proxy:None]
+[2017-04-07 17:34:39,876-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/m50098085017/]
+[2017-04-07 17:34:39,877-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:34:39,958-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): sso.toutiao.com
+[2017-04-07 17:34:40,281-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/m50098085017/][200][proxy:None]
+[2017-04-07 17:35:22,830-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.huxiu.com/article/175695.html]
+[2017-04-07 17:35:22,834-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.huxiu.com
+[2017-04-07 17:35:22,941-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:35:23,382-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.huxiu.com/article/175695.html][200][proxy:None]
+[2017-04-07 17:35:23,392-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[https://www.huxiu.com/member/322384.html]
+[2017-04-07 17:35:23,393-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:35:23,848-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][https://www.huxiu.com/member/322384.html][200][proxy:None]
+[2017-04-07 17:35:23,869-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html]
+[2017-04-07 17:35:23,870-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:35:24,309-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html][200][proxy:None]
+[2017-04-07 17:35:24,319-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/author/niu2208]
+[2017-04-07 17:35:24,319-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:35:24,601-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/author/niu2208][200][proxy:None]
+[2017-04-07 17:35:24,607-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/i6366436759131128321/]
+[2017-04-07 17:35:24,607-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:35:24,901-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/i6366436759131128321/][200][proxy:None]
+[2017-04-07 17:35:24,905-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/m50098085017/]
+[2017-04-07 17:35:24,906-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:35:24,991-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): sso.toutiao.com
+[2017-04-07 17:35:25,305-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/m50098085017/][200][proxy:None]
+[2017-04-07 17:38:30,508-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.huxiu.com/article/175695.html]
+[2017-04-07 17:38:30,512-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.huxiu.com
+[2017-04-07 17:38:30,601-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:38:31,121-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.huxiu.com/article/175695.html][200][proxy:None]
+[2017-04-07 17:38:31,131-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[https://www.huxiu.com/member/322384.html]
+[2017-04-07 17:38:31,132-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): www.huxiu.com
+[2017-04-07 17:38:31,583-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][https://www.huxiu.com/member/322384.html][200][proxy:None]
+[2017-04-07 17:38:31,595-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html]
+[2017-04-07 17:38:31,596-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:38:32,095-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/news/201612/09HecjzLRdGX3r81.html][200][proxy:None]
+[2017-04-07 17:38:32,105-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.leiphone.com/author/niu2208]
+[2017-04-07 17:38:32,106-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.leiphone.com
+[2017-04-07 17:38:32,438-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.leiphone.com/author/niu2208][200][proxy:None]
+[2017-04-07 17:38:32,447-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/i6366436759131128321/]
+[2017-04-07 17:38:32,448-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:38:32,643-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/i6366436759131128321/][200][proxy:None]
+[2017-04-07 17:38:32,648-pz_crawler.package(WARNING)crawler.py:78][NO_USE_PROXY]This crawler not use proxy!--[http://www.toutiao.com/m50098085017/]
+[2017-04-07 17:38:32,649-urllib3.connectionpool(INFO)connectionpool.py:264]Starting new HTTP connection (1): www.toutiao.com
+[2017-04-07 17:38:32,781-urllib3.connectionpool(INFO)connectionpool.py:716]Starting new HTTPS connection (1): sso.toutiao.com
+[2017-04-07 17:38:33,121-pz_crawler.package(INFO)crawler.py:111][CRAWLER_RESULT][http://www.toutiao.com/m50098085017/][200][proxy:None]
