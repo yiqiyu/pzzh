@@ -2,8 +2,7 @@
 from __future__ import absolute_import
 __author__ = 'commissar'
 
-
-from pz_crawler.conf.setting import log
+from pz3_crawler.conf.setting import log
 
 try:
     from urllib.parse import urlencode
@@ -14,11 +13,13 @@ import requests
 import traceback
 import re
 
-
 class Crawler(object):
     '''
     这是下载基类，如不进行派生，那么将使用基础的。
     '''
+
+    SEARCH_URL = ""
+
     def __init__(self,domain,header,proxy=None,ref_url=None,cookie=None,end_rule=None,url_type=None,encode='utf8',**kwargs):
         '''
 
@@ -54,8 +55,8 @@ class Crawler(object):
         if self._content:
             for rt in self._end_rule:
 
-                re_ret = re.search(rt, self._content, re.IGNORECASE)
-                if not re_ret:
+                re_ret = re.search(rt,self._content,re.IGNORECASE)
+                if not re_ret :
                     b_result = False
         else:
             b_result = False
@@ -88,36 +89,37 @@ class Crawler(object):
         if header:
             s.headers.update(header)
 
-        resp = s.get(url, timeout=timeout)
+        resp = s.get(url,timeout=timeout)
         status_code = resp.status_code
 
-        msg = "[CRAWLER_RESULT][%s][%s][proxy:%s]" % (url, resp.status_code, t_proxy)
+        msg = "[CRAWLER_RESULT][%s][%s][proxy:%s]"%(url,resp.status_code,t_proxy)
         content = resp.content
 
-        if isinstance(content, bytes):
-            content = content.decode()
+        if isinstance(content,bytes):
+            content = content.decode(self._encode)
         if resp.status_code == 200:
 
-            try:
+            # try:
                 #用chardet进行内容分析
                 # str_code = chardet.detect(data)
 
-                if self._encode not in ['utf-8', 'utf8']:
-                    try:
-                        content = content.decode(self._encode).encode('utf-8')
-                    except Exception as e:
-                        log.error(traceback.format_exc())
+                # if not self._encode in ['utf-8','utf8'] :
+                #     try:
+                #         content = content.decode(self._encode).encode('utf-8')
+                #     except:
+                #         log.error(traceback.format_exc())
                 self._content = content
                 log.info(msg)
 
-            except Exception as e:
-                msg = "%s:[%s]"%(msg, traceback.format_exc())
-                log.error(msg)
+            # except:
+            #     msg = "%s:[%s]"%(msg,traceback.format_exc())
+            #     log.error(msg)
 
         else:
             header_str = str(s.headers)#simplejson.dumps(s.headers, ensure_ascii=False)
 
-            msg = "%s[%s][proxy:%s][header:%s]" % (msg, content, t_proxy, header_str)
+            msg = "%s[%s][proxy:%s][header:%s]"%(msg,content,t_proxy,header_str)
             log.warn(msg)
 
-        return status_code, content
+        return status_code,content
+

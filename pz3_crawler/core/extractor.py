@@ -5,11 +5,10 @@ import re
 import lxml
 from lxml import etree
 from lxml.etree import _Element
-try:
-    import HTMLParser
-except ImportError:
-    from html.parser import HTMLParser
+
+from html.parser import HTMLParser
 from bs4 import BeautifulSoup
+# from pz3_crawler.core.parser import HTMLParser
 
 import sys
 # reload(sys)
@@ -46,14 +45,15 @@ class RegexValueExtractor(BaseValueExtractor):
 
     FUNCS = [FUNC_SEARCH, FUNC_SUB]
 
-    def __init__(self, type, express, func='search',param=-1,**kwargs):
 
-        super(RegexValueExtractor,self).__init__( type, express, func, **kwargs)
+    def __init__(self,type, express, func='search',param=-1,**kwargs):
+
+        super(RegexValueExtractor,self).__init__( type, express, func, **kwargs )
         self.param = param
         # self.expression = expression
-        self.builded_exp = re.compile(express, re.IGNORECASE)
+        self.builded_exp = re.compile(express,re.IGNORECASE)
 
-        if self.func not in RegexValueExtractor.FUNCS:
+        if not self.func in RegexValueExtractor.FUNCS:
             raise UnsupportFuncException()
 
     def _search(self,last_val):
@@ -77,7 +77,6 @@ class RegexValueExtractor(BaseValueExtractor):
 
         new_val = getattr(self, "_"+self.func)(last_val)
         return new_val
-
 
 class XpathValueExtractor(BaseValueExtractor):
     '''
@@ -206,7 +205,7 @@ class OtherValueExtractor(BaseValueExtractor):
 
         #unescape 将上次的结果进行HTML转义，即将&amp; &lt; &gt; 转换成 & < >
         if self.func == "unescape":
-            html_parser = HTMLParser.HTMLParser()
+            html_parser = HTMLParser()#.HTMLParser()
             return html_parser.unescape(last_val)
         else:
             return last_val

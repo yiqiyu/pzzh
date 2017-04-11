@@ -3,9 +3,12 @@
 __author__ = 'commissar'
 
 import json
-from pzcode.mongocrawler.test_base import TestClass
 
-from pz_download.handler.select import SearchCrawler
+from pz3_crawler.test.test_base import TestClass
+
+from pz3_crawler.core.search_crawler import SearchCrawler
+
+from pz3_crawler.conf.setting import log
 
 class TestIdol(TestClass):
 
@@ -169,7 +172,7 @@ class TestIdol(TestClass):
 
         result = crawler.get_page_urls()
 
-        print json.dumps(result,ensure_ascii=False, indent=4)
+        log.log(json.dumps(result,ensure_ascii=False, indent=4))
 
 
     def test_news(self):

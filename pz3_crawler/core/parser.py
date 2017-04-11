@@ -80,12 +80,13 @@ class ExtractorGroup(object):
     '''
 
     def __init__(self, actions):
-        self.extractors = self._build_extractor(actions)        # 提取表达式列表。
 
-    def _build_extractor(self, actions):
+        self.extractors = self._build_extractor(actions)        #提取表达式列表。
+
+    def _build_extractor(self,actions):
         '''
         将规则建立成解析对象。
-        :param actions: [dict] rule里的value
+        :param actions:
         :return:
         '''
         act_list = []
@@ -151,26 +152,31 @@ class ExtractorObjectGroup(ExtractorGroup):
 
         self._inner_actions = {}        #内部对象的动作集
 
-        outer_acts = actions.get("express", [])
-        super(ExtractorObjectGroup, self).__init__(outer_acts)
+        outer_acts = actions.get("express",[])
+        super(ExtractorObjectGroup,self).__init__(outer_acts)
 
-        property_dict = actions.get("property", {})
+        property_dict = actions.get("property",{})
         for filed_name, filed_actions in property_dict.items():
-            self._inner_actions[filed_name] = ExtractorGroup(filed_actions)
+            self._inner_actions [filed_name] = ExtractorGroup(filed_actions)
 
-    def get_value(self, content, xml_doc):
-        tmp_result = super(ExtractorObjectGroup, self).get_value(content, xml_doc)
+
+    def get_value(self,content, xml_doc):
+
+        tmp_result = super(ExtractorObjectGroup,self).get_value(content, xml_doc)
         result = {}
 
-        if isinstance(tmp_result, (list, set)):
+
+        if isinstance(tmp_result,(list,set)):
             result = []
 
             for tmp_item in tmp_result:
 
-                # if isinstance(tmp_item, unicode):
+                # if isinstance(tmp_item,unicode):
                 #     tmp_item = tmp_item.encode("utf-8")
 
-                tmp_xml = etree.HTML(tmp_item.lower().decode('utf-8'))
+                #tmp_xml = etree.HTML(tmp_item.lower().decode('utf-8'))
+                tmp_xml = etree.HTML(tmp_item.lower())
+
 
                 tmp_obj = {}
 
@@ -229,7 +235,6 @@ class ExtractorObjectGroup(ExtractorGroup):
 
 class HtmlParserBase(object):
 
-    # 以下用于db载入时使用
     TYPE_ARTICLE = "article"
     TYPE_COMMENT = "comment"
     TYPE_MEDIA = "media"
@@ -285,12 +290,13 @@ class HtmlParserBase(object):
         try:
             for t_rule in self.rule["parse_rules"]:
                 for _url_match in t_rule["url_match"]:
-                    if re.match(_url_match, url, re.IGNORECASE):
-                        return "parse_rules", t_rule
-        except Exception:
-            logging.warning(traceback.format_exc().replace('\n', ' '))
+                    if re.match(_url_match,url,re.IGNORECASE):
+                        return "parse_rules",t_rule
+        except:
+            logging.warn(traceback.format_exc().replace('\n',' '))
 
-        return "parser_py", self.get_parser_py(url)
+        return "parser_py",self.get_parser_py(url)
+
 
     def get_parser_py(self, url):
         '''
@@ -306,21 +312,13 @@ class HtmlParserBase(object):
         try:
             for t_rule in self.rule["parse_py"]:
                 for _url_match in t_rule["url_match"]:
-                    if re.match(_url_match, url, re.IGNORECASE):
+                    if re.match(_url_match,url,re.IGNORECASE):
                         return t_rule
         except:
-            logging.warning('parse_py error for url %s' % url)
+            logging.warn('parse_py error for url %s' % url)
         return None
 
-    def parser_py(self, url, content, config):
-        modulepath = config['modulepath'] # python类的命名空间
-        logging.info(modulepath)
-        cha = importlib.import_module(modulepath)
-        class_ = getattr(cha, config['class'])()
-        data = getattr(class_, config['function'])(url, content, config)
-        return data
-
-    def add_rules(self, rules, parse_type):
+    def add_rules(self,rules,parse_type):
         '''
         增加解析与匹配规则。
         :param rules:   [list()]列表中为新增规则。
@@ -345,11 +343,30 @@ class HtmlParserBase(object):
 
     def parser(self, url, content):
         fun_str, config = self.get_parser_rules(url)
-        return getattr(self, fun_str)(url, content, config)
+        return getattr(self, fun_str)(url,content,config)
+
+    def parser_py(self, url, content,config):
+        modulepath = config['modulepath'] #python类的命名空间
+        logging.info(modulepath)
+        cha = importlib.import_module(modulepath)
+        class_ = getattr(cha, config['class'])()
+        data = getattr(class_, config['main'])(url,content,config)
+        return data
+
+
+    def decode_html(html_string):
+        from bs4 import UnicodeDammit             # BeautifulSoup 4
+
+        converted = UnicodeDammit(html_string)
+        if not converted.unicode_markup:
+            raise UnicodeDecodeError(
+                "Failed to detect encoding, tried [%s]",
+                ', '.join(converted.tried_encodings))
+        # print converted.original_encoding
+        return converted.unicode_markup
 
     def parse_rules(self, url, content, config):
         '''
-        :param config: [dict] parser_rules里能匹配的url的rule
         对内容进行解析。
         :return:    [parse_rules中的Item],结构见
         {
@@ -382,18 +399,19 @@ class HtmlParserBase(object):
                     r"[^!]([-]{2,})[^>]"]
 
         for reg_pl in reg_list:
-            html_src, _ = re.subn(reg_pl, "", html_src, 0, re.IGNORECASE | re.MULTILINE)
+            html_src,_ = re.subn(reg_pl, "", html_src,0,re.IGNORECASE|re.MULTILINE)
 
-        if isinstance(content, str):
+
+        if isinstance(content,str):
             # document = etree.HTML(content.lower())
 
-            document = lxml.html.soupparser.fromstring(html_src.lower(), features='html5lib')#'html.parser')
+            document =  lxml.html.soupparser.fromstring(html_src.lower(),features='html5lib')#'html.parser')
             # document = lxml.html.html5parser.fromstring(html_src)
             # document = lxml.html.fromstring(html_src)
         else:
             # document = etree.HTML(content.lower().decode('utf-8'))
 
-            document = lxml.html.soupparser.fromstring(html_src.lower().decode('utf-8'), features='html5lib')
+            document =  lxml.html.soupparser.fromstring(html_src.lower().decode('utf-8'),features='html5lib')
             # document = lxml.html.html5parser.fromstring(html_src.decode('utf-8'))
             # document = lxml.html.fromstring(html_src.decode('utf-8'))
 
@@ -401,7 +419,7 @@ class HtmlParserBase(object):
         result = {}
         for field_name, field_express in config.items():
 
-            if field_name in ["rule_uuid", "url_match"]:
+            if field_name in ["rule_uuid","url_match"]:
                 continue
 
             t_extractor = None
@@ -410,23 +428,11 @@ class HtmlParserBase(object):
                 t_extractor = ExtractorObjectGroup(field_express)
             else:
                 t_extractor = ExtractorGroup(field_express)
-            t_val = t_extractor.get_value(content, document)
+            t_val = t_extractor.get_value(content,document)
 
             result[field_name] = t_val
 
         return result
-
-    @staticmethod
-    def decode_html(html_string):
-        from bs4 import UnicodeDammit             # BeautifulSoup 4
-
-        converted = UnicodeDammit(html_string)
-        if not converted.unicode_markup:
-            raise UnicodeDecodeError(
-                "Failed to detect encoding, tried [%s]",
-                ', '.join(converted.tried_encodings))
-        # print converted.original_encoding
-        return converted.unicode_markup
 
 
 class UrlParserJudge(object):
@@ -435,10 +441,6 @@ class UrlParserJudge(object):
     '''
     def __init__(self, mongodb):
         '''
-    URL解析判断器，通过URL来判断此页面是否可被解析。
-    '''
-        '''
-
         :param mongo_connect_str:   [str]mongo连接字符串，如"mongodb://localhost:27017/"
         :param mongo_db:            [str]数据库名。
         :param mongo_user:          [str]用户名
@@ -499,23 +501,24 @@ class ParserRuleDb(object):
         domain = rule['domain']
         rules = rule[parse_type]
         rule = {
-            "domain": domain,
-            "type": rtype,
-            parse_type: []
+            "domain":domain,
+            "type":rtype,
+            parse_type:[]
         }
 
         parser = HtmlParserBase(rule)
-        parser.add_rules(rules, parse_type)
+        parser.add_rules(rules,parse_type)
         doc = parser.to_mongo_document()
 
-        rule_doc = self.db.rules.find_one({"domain": domain.lower(), "type": rtype})
+        rule_doc = self.db.rules.find_one({"domain":domain.lower(),"type":rtype})
         if not rule_doc:
             result = self.db.rules.insert(doc)
         else:
-            parser.add_rules(rule_doc.get(parse_type, []), parse_type)
+
+            parser.add_rules(rule_doc.get(parse_type,[]),parse_type)
             doc = parser.to_mongo_document()
 
-            result = self.db.rules.update({"domain": doc["domain"], "type": rtype}, doc)
+            result = self.db.rules.update({"domain":doc["domain"],"type":rtype}, doc)
 
         return result
 
