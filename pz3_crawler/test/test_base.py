@@ -8,25 +8,14 @@ from pz3_crawler.core.crawler import Crawler
 from pz3_crawler.core.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
 from pz.tools.mongoutils import mongo
 import pymongo
-#
-# # -*- coding: utf-8 -*-
-#
-# import unittest
-# import pymongo
-# import re
-# from pzcode import config
+
 from pz3_crawler.core.crawler_mgr import CrawlerMgr
 from pz3_crawler.core.crawler_conf import CrawlerConf,CrawlerConfItem
 
-# from pz_download.handler.base import CrawlerConfItem,CrawlerConf,Crawler
-# from pzcode.mongocrawler.parser import ParserRuleDb,UrlParserJudge,HtmlParserBase
 import json
 from pz3_crawler.conf.setting import log
 
-# from pz_download.handler.log import get_log
 import tldextract
-#
-# log = get_log()
 #
 
 class TestClass(unittest.TestCase):
