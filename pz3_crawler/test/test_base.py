@@ -58,7 +58,10 @@ class TestClass(unittest.TestCase):
         :return:
         '''
         db = ParserRuleDb(self.mongo_connect,self.crawler_rule_db_name)
-        db.add_parser_rule(rule,    HtmlParserBase.PARSE_RULES, type)
+        if HtmlParserBase.PARSE_RULES in rule:
+            db.add_parser_rule(rule,    HtmlParserBase.PARSE_RULES, type)
+        else:
+            db.add_parser_rule(rule, HtmlParserBase.PARSE_PY, type)
 
 
     def search_crawler_and_parser_from_db(self,search_name, type, header=None, **kwargs):
@@ -1234,65 +1237,6 @@ class TestParserHtml(unittest.TestCase):
         self.__crawler_and_parser(url,rule,header)
 
         # self.__crawler_and_parser_from_db(url,HtmlParserBase.TYPE_MEDIA,header)
-
-    def test_sina_search(self):
-        header = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'zh-CN,zh;q=0.8',
-            'Connection': 'keep-alive',
-            'Cookie': 'UOR=www.baidu.com,www.sina.com.cn,; SINAGLOBAL=183.48.243.58_1490754786.942741; Apache=183.48.243.58_1490754787.200075; SGUID=1490754787485_59067253; vjuids=5e96c53d.15b17e8d9f5.0.50f26de15aba2; ULV=1490754788074:2:2:2:183.48.243.58_1490754787.200075:1490754787350; SUB=_2AkMvh5I2f8NhqwJRmP4Qz2LraIRzyArEieKZ22PtJRMyHRl-yD83qlEbtRDDSXejvLr3SNFBJccNeVcArgPyKw..; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WW.hF-G5Bgv.pNR0ra1PneR; U_TRS1=0000003a.2ada593e.58db1d2a.f45e7918; U_TRS2=0000003a.2aec593e.58db1d2a.235df27e; WEB2_OTHER=86b3c3bb2c3b4f93e9d072c16c59cb0f; rotatecount=1; SessionID=b7mqeo3i1thp0dt3f2cil3kdi7; vjlast=1490757084; lxlrttp=1490686119',
-            'Host': 'api.search.sina.com.cn',
-            'Referer': 'http://www.sina.com.cn/mid/search.shtml?q=%E4%B8%96%E7%95%8C%E6%9C%80%E5%A4%A7%E9%87%91%E5%B8%81%E8%A2%AB%E5%81%B7',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
-        }
-
-        url = "http://api.search.sina.com.cn/?c=news&t=&q=%E5%BC%A0%E5%AD%A6%E5%8F%8B%E8%A2%AB%E5%96%8A%E5%88%98%E5%BE%B7%E5%8D%8E&pf=2130835692&ps=2130770162&page=1&stime=2016-04-09&etime=2017-04-11&sort=rel&highlight=1&num=10&ie=utf-8&callback=&_=1491802690533"
-
-        rule = {
-            "domain": "sina.com.cn",
-            "type": "search",
-            "parse_py": [
-                {
-                    "rule_uuid": "xxxx",  # 这条匹配规则的ID，
-                    "url_match": ["^http[s]?://api.search.sina.com.cn/\?.", ],
-                    "modulepath": "pz_crawler.parse_py.sina_search",  # python类的命名空间
-                    "class": "sina_search",
-                    "function": "main"
-                }
-            ],
-            "item": [
-                {
-                    "name": "default",
-                    "url_template": [
-                        "^http[s]?://api.search.sina.com.cn/?"
-                    ],
-                    "end_rule": [ ],
-                    "header": {
-                        'Accept': '*/*',
-                        'Accept-Encoding': 'gzip, deflate, sdch',
-                        'Accept-Language': 'zh-CN,zh;q=0.8',
-                        'Connection': 'keep-alive',
-                        'Host': 'api.search.sina.com.cn',
-                        'Referer': 'http://www.sina.com.cn/mid/search.shtml?q=%E4%B8%96%E7%95%8C%E6%9C%80%E5%A4%A7%E9%87%91%E5%B8%81%E8%A2%AB%E5%81%B7',
-                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
-                    },
-                    "cookie" : "UOR=www.baidu.com,www.sina.com.cn,; SINAGLOBAL=183.48.243.58_1490754786.942741; Apache=183.48.243.58_1490754787.200075; SGUID=1490754787485_59067253; vjuids=5e96c53d.15b17e8d9f5.0.50f26de15aba2; ULV=1490754788074:2:2:2:183.48.243.58_1490754787.200075:1490754787350; SUB=_2AkMvh5I2f8NhqwJRmP4Qz2LraIRzyArEieKZ22PtJRMyHRl-yD83qlEbtRDDSXejvLr3SNFBJccNeVcArgPyKw..; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WW.hF-G5Bgv.pNR0ra1PneR; U_TRS1=0000003a.2ada593e.58db1d2a.f45e7918; U_TRS2=0000003a.2aec593e.58db1d2a.235df27e; WEB2_OTHER=86b3c3bb2c3b4f93e9d072c16c59cb0f; SessionID=b7mqeo3i1thp0dt3f2cil3kdi7; lxlrtst=1491548881_o; ArtiFSize=14; rotatecount=2; vjlast=1491802683; lxlrttp=1491745006",
-                    "url_type" : "search",
-                    "encode" : "gbk",
-                    "url_build_rule" : {
-                        "param" : {
-                            "key_type" : "_tbk_",
-                            "keyword" : {
-                                "encode": "gbk",
-                                "quote": "true"
-                            }
-                        },
-                    }
-                }
-            ],
-        }
-        self.__crawler_and_parser(url, rule, header)
 
     def test_ent_sina_column_article(self):
         url = "http://ent.sina.com.cn/zl/discuss/2017-04-10/doc-ifyeceza1837231.shtml"

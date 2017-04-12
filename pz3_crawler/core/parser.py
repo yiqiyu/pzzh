@@ -241,7 +241,7 @@ class HtmlParserBase(object):
     TYPE_SEARCH = "search"      #代表搜索结果可跟踪列表
 
     PARSE_RULES= "parse_rules"
-    PARSE_PY = "parser_py"
+    PARSE_PY = "parse_py"
 
     def __init__(self, rule):
         '''
@@ -288,12 +288,13 @@ class HtmlParserBase(object):
 
         '''
         try:
-            for t_rule in self.rule["parse_rules"]:
-                for _url_match in t_rule["url_match"]:
-                    if re.match(_url_match,url,re.IGNORECASE):
-                        return "parse_rules",t_rule
+            if "parser_rules" in self.rule:
+                for t_rule in self.rule["parse_rules"]:
+                    for _url_match in t_rule["url_match"]:
+                        if re.match(_url_match,url,re.IGNORECASE):
+                            return "parse_rules",t_rule
         except:
-            logging.warn(traceback.format_exc().replace('\n',' '))
+            logging.warning(traceback.format_exc().replace('\n',' '))
 
         return "parser_py",self.get_parser_py(url)
 
@@ -335,7 +336,7 @@ class HtmlParserBase(object):
         #确认没有重叠的再将对象加到规则中。
         for new_ru in rules:
             m = hashlib.md5()
-            m.update(",".join(new_ru["url_match"]))
+            m.update(",".join(new_ru["url_match"]).encode())
             new_ru["rule_uuid"] = m.hexdigest()
             self.rule[parse_type].append(new_ru)
 
@@ -350,7 +351,7 @@ class HtmlParserBase(object):
         logging.info(modulepath)
         cha = importlib.import_module(modulepath)
         class_ = getattr(cha, config['class'])()
-        data = getattr(class_, config['main'])(url,content,config)
+        data = getattr(class_, config['function'])(url,content,config)
         return data
 
     @staticmethod

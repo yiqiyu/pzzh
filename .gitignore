@@ -1,2 +1,10 @@
 
 html_to_object
+
+pz3_crawler/tools/insert_into_db\.py
+
+pz3_crawler/test/log/
+
+pz3_crawler/core/test\.py
+
+pz3_crawler/parse_py/sina_search\.py

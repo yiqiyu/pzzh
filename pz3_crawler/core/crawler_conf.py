@@ -3,6 +3,8 @@ __author__ = 'commissar'
 
 import re
 import urllib
+import tldextract
+
 
 class CrawlerConfItem(object):
     '''
@@ -101,7 +103,7 @@ class CrawlerConfItem(object):
                     url_k_val = k_val
                     #在组装URL时将部分参数转成gdk编码。
                     if param_encode:
-                        if isinstance(k_val,unicode):#not isinstance(k_val, unicode):
+                        if isinstance(k_val,str):#not isinstance(k_val, unicode):
                             url_k_val = url_k_val.encode(param_encode)
                         else:
                             url_k_val = url_k_val.decode('utf-8').encode(param_encode)
